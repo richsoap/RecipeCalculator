@@ -3,6 +3,7 @@ package memory
 import (
 	"github.com/richsoap/RecipeCalculator/errors"
 	"github.com/richsoap/RecipeCalculator/storage/recipe"
+	"github.com/sirupsen/logrus"
 )
 
 type recipeStorage struct {
@@ -26,6 +27,7 @@ func (s *recipeStorage) AddRecipe(recipe recipe.Recipe) (uint64, error) {
 		Recipe: &recipe,
 		Remove: false,
 	})
+	logrus.WithField("item", recipe.Item).WithField("depends", recipe.Depends).Info("new recipe")
 	return recipe.ID, nil
 }
 

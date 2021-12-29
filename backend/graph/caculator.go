@@ -6,6 +6,7 @@ import (
 	"github.com/richsoap/RecipeCalculator/errors"
 	"github.com/richsoap/RecipeCalculator/storage/item"
 	"github.com/richsoap/RecipeCalculator/storage/recipe"
+	"github.com/richsoap/RecipeCalculator/utils"
 )
 
 type GraphCaculator struct {
@@ -58,11 +59,9 @@ func (r *GraphCaculator) Caculate(want ItemStack, have ItemStack, recipeSelect R
 			Error: errors.CIRCLE_DEPENDENCY,
 		}
 	}
-	for i := range nodes {
-		if i >= len(nodes)-1-i {
-			break
-		}
-		nodes[i], nodes[len(nodes)-1-i] = nodes[len(nodes)-1-i], nodes[i]
+	length := len(nodes)
+	for i := 0; i < length/2; i++ {
+		nodes[i], nodes[length-1-i] = nodes[length-1-i], nodes[i]
 	}
 	return &CaculateResult{
 		Nodes: nodes,
@@ -121,6 +120,16 @@ func (r *GraphCaculator) buildRecipeGraph(want ItemStack, recipeSelect RecipeSel
 			}
 		}
 		node, err := NewNodeFromItemAndRecipe(currentItem, currentRecipe)
+		if currentRecipe != nil {
+			recipeMap, err := utils.StringDependsToMap(currentRecipe.Depends)
+			// Need more info in error
+			if err != nil {
+				return nil, nil, err
+			}
+			for child := range recipeMap {
+				idStacks = append(idStacks, child)
+			}
+		}
 		if err != nil {
 			return nil, nil, err
 		}

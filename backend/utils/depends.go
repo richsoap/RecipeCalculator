@@ -35,6 +35,7 @@ func MapDependsToString(in map[uint64]int64) string {
 		if !first {
 			sb.WriteByte(';')
 		}
+		first = false
 		sb.WriteString(strconv.Itoa(int(k)))
 		sb.WriteByte(':')
 		sb.WriteString(strconv.Itoa(int(v)))
