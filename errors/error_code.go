@@ -10,6 +10,7 @@ const (
 	ITEM_NOT_FOUND
 	BROKEN_DATA
 	CIRCLE_DEPENDENCY
+	CONFLICT_OPTIONS
 )
 
 func (e errorCode) Error() string {

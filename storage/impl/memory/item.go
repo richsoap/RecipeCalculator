@@ -1,6 +1,8 @@
 package memory
 
 import (
+	"strings"
+
 	"github.com/richsoap/RecipeCalculator/errors"
 	"github.com/richsoap/RecipeCalculator/storage/item"
 	"github.com/sirupsen/logrus"
@@ -51,6 +53,9 @@ func (s *memoryItemStorage) UpdateItem(item item.Item) error {
 
 func (s *memoryItemStorage) GetItems(options ...item.SearchOption) (item.Items, error) {
 	option := item.ParseOptions(options...)
+	if err := option.IsValid(); err != nil {
+		return nil, err
+	}
 	ids := make(map[uint64]int)
 	names := make(map[string]int)
 	result := make(item.Items, 0)
@@ -68,6 +73,9 @@ func (s *memoryItemStorage) GetItems(options ...item.SearchOption) (item.Items, 
 			continue
 		}
 		if _, exist := names[desc.Item.Name]; len(names) > 0 && !exist {
+			continue
+		}
+		if len(option.Prefix) > 0 && !strings.HasPrefix(desc.Item.Name, option.Prefix) {
 			continue
 		}
 		result = append(result, *desc.Item)

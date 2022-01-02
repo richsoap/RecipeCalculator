@@ -26,12 +26,18 @@ func (s *gormStorage) GetItems(options ...item.SearchOption) (item.Items, error)
 		return nil, errors.NOT_INITIALIZED
 	}
 	option := item.ParseOptions(options...)
+	if err := option.IsValid(); err != nil {
+		return nil, err
+	}
 	conn := s.db.Model(&item.Item{})
 	if len(option.FilterIDs) > 0 {
 		conn = conn.Where("id IN ?", option.FilterIDs)
 	}
 	if len(option.FilterNames) > 0 {
 		conn = conn.Where("name IN ?", option.FilterNames)
+	}
+	if len(option.Prefix) > 0 {
+		conn = conn.Where("name LIKE ?", option.Prefix+"%")
 	}
 	result := make(item.Items, 0)
 	if sqlResut := conn.Scan(&result); sqlResut.Error != nil {
